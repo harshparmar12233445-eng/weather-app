@@ -1,43 +1,68 @@
-const form = document.getElementById('searchForm');
-const cityInput = document.getElementById('cityInput');
-const result = document.getElementById('result');
-const errorEl = document.getElementById('error');
-const cityNameEl = document.getElementById('cityName');
-const descriptionEl = document.getElementById('description');
-const tempEl = document.getElementById('temp');
-const humidityEl = document.getElementById('humidity');
-const windEl = document.getElementById('wind');
-const iconEl = document.getElementById('icon');
+// Replace with your OpenWeatherMap API key
+const OPENWEATHER_API_KEY = "YOUR_OPENWEATHERMAP_API_KEY";
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const city = cityInput.value.trim();
-  if (!city) return;
-  errorEl.classList.add('hidden');
-  result.classList.add('hidden');
+// ---- Notes App ----
+const notesKey = "notes-weather-app.notes.v1";
 
+function getNotes() {
   try {
-    const res = await fetch(`/weather?city=${encodeURIComponent(city)}`);
-    if (!res.ok) {
-      const err = await res.json().catch(()=>({message: 'Unknown error'}));
-      throw new Error(err.message || 'Failed to fetch weather');
-    }
-    const data = await res.json();
-    cityNameEl.textContent = `${data.name}, ${data.country || ''}`;
-    descriptionEl.textContent = data.description;
-    tempEl.textContent = Math.round(data.temperature);
-    humidityEl.textContent = data.humidity;
-    windEl.textContent = data.wind_speed;
-    if (data.icon_url) {
-      iconEl.src = data.icon_url;
-      iconEl.alt = data.description;
-    } else {
-      iconEl.src = '';
-      iconEl.alt = '';
-    }
-    result.classList.remove('hidden');
-  } catch (err) {
-    errorEl.textContent = err.message || 'Could not get weather';
-    errorEl.classList.remove('hidden');
+    const raw = localStorage.getItem(notesKey);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
   }
-});
+}
+
+function saveNotes(notes) {
+  localStorage.setItem(notesKey, JSON.stringify(notes));
+}
+
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+const noteForm = document.getElementById("note-form");
+const titleInput = document.getElementById("note-title");
+const contentInput = document.getElementById("note-content");
+const notesListEl = document.getElementById("notes-list");
+const searchInput = document.getElementById("search");
+const clearBtn = document.getElementById("clear-notes");
+
+let editingId = null;
+
+function renderNotes(filter = "") {
+  const notes = getNotes().slice().reverse(); // show newest first
+  const filtered = notes.filter(n =>
+    (n.title + " " + n.content).toLowerCase().includes(filter.toLowerCase())
+  );
+
+  if (filtered.length === 0) {
+    notesListEl.innerHTML = `<p class="muted">No notes yet.</p>`;
+    return;
+  }
+
+  notesListEl.innerHTML = "";
+  filtered.forEach(note => {
+    const card = document.createElement("div");
+    card.className = "note";
+    card.innerHTML = `
+      <div class="left">
+        <h3>${escapeHtml(note.title)}</h3>
+        <p>${escapeHtml(note.content)}</p>
+        <div class="meta">${new Date(note.createdAt).toLocaleString()}</div>
+      </div>
+      <div class="actions">
+        <button class="btn edit" data-id="${note.id}">Edit</button>
+        <button class="btn danger delete" data-id="${note.id}">Delete</button>
+      </div>
+    `;
+    notesListEl.appendChild(card);
+  });
+
+  // hook up actions
+  notesListEl.querySelectorAll(".delete").forEach(btn => {
+    btn.addEventListener("click", e => {
+      const id = e.currentTarget.dataset.id;
+      deleteNote(id);
+    });
+`*
