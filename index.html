@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Notes & Weather App</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Notes & Weather</h1>
+  </header>
+
+  <main class="container">
+    <section class="notes-panel">
+      <div class="notes-controls">
+        <form id="note-form" class="note-form">
+          <input id="note-title" type="text" placeholder="Title" maxlength="100" required />
+          <textarea id="note-content" rows="4" placeholder="Write your note..." required></textarea>
+          <div class="form-row">
+            <button type="submit" class="btn primary">Save Note</button>
+            <button id="clear-notes" type="button" class="btn danger">Clear All</button>
+          </div>
+        </form>
+
+        <div class="search-row">
+          <input id="search" type="search" placeholder="Search notes..." />
+        </div>
+      </div>
+
+      <div id="notes-list" class="notes-list" aria-live="polite"></div>
+    </section>
+
+    <aside class="weather-panel">
+      <div class="weather-card">
+        <h2>Weather</h2>
+
+        <form id="weather-form" class="weather-form">
+          <input id="city" type="text" placeholder="Enter city (e.g. London)" required />
+          <button type="submit" class="btn">Get Weather</button>
+        </form>
+
+        <div id="weather-result" class="weather-result">
+          <p class="muted">No weather data yet. Try a city above.</p>
+        </div>
+
+        <button id="use-location" class="btn small">Use My Location</button>
+      </div>
+
+      <div class="about">
+        <p>Notes are stored locally in your browser. Weather data from <a href="https://openweathermap.org/" target="_blank" rel="noreferrer">OpenWeatherMap</a>.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="app-footer">
+    <small>Built with plain HTML, CSS, and JavaScript.</small>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
